@@ -13,7 +13,7 @@ def resource_path(relative_path):
 
 def main():
     app = QApplication(sys.argv)
-    app.setAttribute(Qt.AA_DisableHighDpiScaling)
+
 
     splash_path = resource_path("resources/splash.png")
     splash_pix = QPixmap(splash_path)

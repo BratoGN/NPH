@@ -58,10 +58,9 @@ class MainWindow(QMainWindow):
         self._init_ui()
         self._init_key_thread()
         self._update_window_size()
-        # Таймер для обновления цвета в реальном времени
         self.color_timer = QTimer(self)
         self.color_timer.timeout.connect(self._update_counter_color)
-        self.color_timer.start(60000)  # Обновление каждую минуту
+        self.color_timer.start(60000)
 
     def _load_counter(self):
         try:
@@ -124,7 +123,7 @@ class MainWindow(QMainWindow):
         self.counter_label.mousePressEvent = self._handle_counter_click
         counter_container.addWidget(self.counter_label)
 
-        self.effects_overlay.set_label(self.counter_label)  # Связываем EffectsOverlay с AnimatedLabel
+        self.effects_overlay.set_label(self.counter_label)
 
         counter_widget = QWidget()
         counter_widget.setLayout(counter_container)
@@ -151,12 +150,11 @@ class MainWindow(QMainWindow):
             "Snip": self._launch_snip
         }
 
-        # Установка иконки для кнопки "T"
         t_path = resource_path("resources/t.png")
         t_pixmap = QPixmap(t_path)
         if t_pixmap.isNull():
             print(f"Failed to load {t_path}. Make sure the file exists in the correct directory.")
-            self.buttons["T"].setText("T")  # Запасной вариант, если изображение не загрузилось
+            self.buttons["T"].setText("T")
         else:
             t_icon = QIcon(t_pixmap.scaled(24, 24, Qt.KeepAspectRatio, Qt.SmoothTransformation))
             self.buttons["T"].setIcon(t_icon)
@@ -426,8 +424,8 @@ class MainWindow(QMainWindow):
         notes_layout = QVBoxLayout(notes_widget)
         notes_layout.setContentsMargins(0, 0, 0, 0)
         notes_layout.setSpacing(5)
-        for text in self.notes[category].values():
-            label = DraggableButtonLabel(text)
+        for note_title, note_value in self.notes[category].items():
+            label = DraggableButtonLabel(note_title, note_value)
             label.setFixedWidth(390)
             label.dragFinished.connect(dialog.accept)
             notes_layout.addWidget(label)
@@ -478,9 +476,9 @@ class MainWindow(QMainWindow):
             self._update_window_size()
 
     def _update_counter_color(self):
-        """Обновляем цвет счетчика в реальном времени."""
         self.counter_label.update_color()
         self.counter_label.update()
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
