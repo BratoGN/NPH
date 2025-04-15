@@ -16,12 +16,16 @@ class PatentCalculator(QWidget):
 
     def initUI(self):
         self.setWindowTitle("Patent Calculator")
-        self.setFixedSize(350, 350)
+        self.setFixedSize(410, 400)
         self.setStyleSheet(PATENT_CALCULATOR_STYLE)
 
         layout = QVBoxLayout()
         layout.setSpacing(10)
         layout.setContentsMargins(15, 15, 15, 15)
+        header_label = QLabel("ФЕДЕРАЛЬНАЯ МИГРАЦИОННАЯ СЛУЖБА")
+        header_label.setAlignment(Qt.AlignCenter)
+        header_label.setStyleSheet("font-size: 16px; font-weight: bold; color: #5a2e3c; margin-bottom: 10px;")
+        layout.insertWidget(0, header_label)
 
         form_layout = QFormLayout()
         form_layout.setSpacing(6)

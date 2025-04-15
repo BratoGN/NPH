@@ -1,7 +1,11 @@
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QFormLayout, QLabel, QLineEdit, QHBoxLayout, QApplication
-from PySide6.QtCore import Qt
+from PySide6.QtWidgets import (
+    QWidget, QVBoxLayout, QFormLayout, QLabel, QLineEdit, QHBoxLayout, QApplication
+)
+from PySide6.QtCore import Qt, QTimer
+from PySide6.QtGui import QIcon, QPixmap
 from datetime import datetime
 from utils.styles import TIME_TRACKER_STYLE, TIME_TRACKER_INPUT_STYLE
+
 
 class TimeTracker(QWidget):
     def __init__(self):
@@ -15,6 +19,11 @@ class TimeTracker(QWidget):
         main_layout = QVBoxLayout()
         main_layout.setContentsMargins(20, 20, 20, 20)
         main_layout.setSpacing(15)
+
+        header = QLabel("\U0001F4BC Учёт времени Nitro")
+        header.setStyleSheet("font-size: 18px; font-weight: bold; color: #FFFFFF;")
+        header.setAlignment(Qt.AlignCenter)
+        main_layout.addWidget(header)
 
         time_layout = QFormLayout()
         time_layout.setSpacing(10)
@@ -48,10 +57,10 @@ class TimeTracker(QWidget):
             font-family: 'SF Pro Text', 'Helvetica Neue', sans-serif;
         """)
         self.total_time_label.setAlignment(Qt.AlignCenter)
+        self.total_time_label.setToolTip("Нажмите, чтобы скопировать")
         self.total_time_label.mousePressEvent = self.copy_to_clipboard
 
         main_layout.addWidget(self.total_time_label)
-
         self.setLayout(main_layout)
 
         self.start_time_edit[1].textChanged.connect(self.calculate_total_time)
@@ -60,11 +69,11 @@ class TimeTracker(QWidget):
 
     def create_time_edit(self, label_text, default_value):
         label = QLabel(label_text)
-        label.setStyleSheet(
-            "font-weight: 600; color: #E0E0E0; font-family: 'SF Pro Text', 'Helvetica Neue', sans-serif;")
+        label.setStyleSheet("font-weight: 600; color: #E0E0E0;")
         line_edit = QLineEdit(default_value)
         line_edit.setFixedWidth(80)
         line_edit.setStyleSheet(TIME_TRACKER_INPUT_STYLE)
+        line_edit.setPlaceholderText("00:00")
         line_edit.textChanged.connect(lambda: self.on_time_entry(line_edit))
         return label, line_edit
 
@@ -74,12 +83,13 @@ class TimeTracker(QWidget):
 
         label = QLabel(label_text)
         label.setFixedWidth(250)
-        label.setStyleSheet("color: #E0E0E0; font-family: 'SF Pro Text', 'Helvetica Neue', sans-serif;")
+        label.setStyleSheet("color: #E0E0E0;")
         layout.addWidget(label)
 
         hour_var = QLineEdit()
         hour_var.setFixedWidth(40)
         hour_var.setStyleSheet(TIME_TRACKER_INPUT_STYLE)
+        hour_var.setPlaceholderText("0 ч")
         hour_var.textChanged.connect(self.calculate_total_time)
         layout.addWidget(hour_var)
 
@@ -90,12 +100,20 @@ class TimeTracker(QWidget):
         minute_var = QLineEdit()
         minute_var.setFixedWidth(40)
         minute_var.setStyleSheet(TIME_TRACKER_INPUT_STYLE)
+        minute_var.setPlaceholderText("0 мин")
         minute_var.textChanged.connect(self.calculate_total_time)
         layout.addWidget(minute_var)
 
         minute_label = QLabel("мин")
         minute_label.setStyleSheet("color: #8E8E93;")
         layout.addWidget(minute_label)
+
+        # Сделать поле актуализации полупрозрачным и неактивным
+        if "Nitro" in label_text:
+            hour_var.setReadOnly(True)
+            minute_var.setReadOnly(True)
+            hour_var.setStyleSheet(TIME_TRACKER_INPUT_STYLE + "background-color: rgba(90,90,90,0.2);")
+            minute_var.setStyleSheet(TIME_TRACKER_INPUT_STYLE + "background-color: rgba(90,90,90,0.2);")
 
         return layout, hour_var, minute_var
 
@@ -134,7 +152,7 @@ class TimeTracker(QWidget):
 
         if nitro_entry:
             nitro_hours, nitro_minutes = nitro_entry
-            remaining_minutes = total_minutes - entered_minutes
+            remaining_minutes = max(total_minutes - entered_minutes, 0)
             nitro_hours.setText(str(remaining_minutes // 60))
             nitro_minutes.setText(str(remaining_minutes % 60))
 
@@ -156,4 +174,7 @@ class TimeTracker(QWidget):
                 time_info += f"{label}: {hours_text} часов {minutes_text} минут\n"
         time_info += f"Время завершения: {self.end_time_edit[1].text()}"
         clipboard.setText(time_info)
-        self.total_time_label.setText("Скопировано в буфер обмена!")
+
+        # Показываем "Скопировано!"
+        self.total_time_label.setText("\u2713 Скопировано в буфер обмена!")
+        QTimer.singleShot(2000, self.calculate_total_time)  # Вернуть обратно через 2 секунды
