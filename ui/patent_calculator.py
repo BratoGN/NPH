@@ -16,7 +16,7 @@ class PatentCalculator(QWidget):
 
     def initUI(self):
         self.setWindowTitle("Patent Calculator")
-        self.setFixedSize(350, 500)
+        self.setFixedSize(350, 350)
         self.setStyleSheet(PATENT_CALCULATOR_STYLE)
 
         layout = QVBoxLayout()
