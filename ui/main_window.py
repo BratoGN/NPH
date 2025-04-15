@@ -1,3 +1,4 @@
+import sys
 import json
 import os
 import re
@@ -5,7 +6,7 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from PySide6.QtWidgets import (
     QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QPushButton, QInputDialog, QDialog, QMessageBox,
-    QLabel, QGraphicsDropShadowEffect, QScrollArea
+    QLabel, QGraphicsDropShadowEffect, QScrollArea, QApplication
 )
 from PySide6.QtCore import Qt, QTimer, QPoint, QSize, QDateTime
 from PySide6.QtGui import QPixmap, QIcon, QFont, QColor
@@ -21,6 +22,7 @@ from utils.autoclicker import AutoClicker
 from utils.key_press_thread import KeyPressThread
 from utils.styles import MAIN_STYLE, BUTTON_STYLE, COUNTER_LABEL_STYLE, DATE_LABEL_STYLE, NOTE_PANEL_STYLE, CLOSE_BUTTON_STYLE
 from utils.helpers import resource_path
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -139,7 +141,7 @@ class MainWindow(QMainWindow):
         top_row = QHBoxLayout()
         top_row.setSpacing(0)
         self.buttons = {
-            "T": QPushButton("⏱️"),
+            "T": QPushButton(),
             "Patent": QPushButton(),
             "Snip": QPushButton("✂️")
         }
@@ -148,6 +150,17 @@ class MainWindow(QMainWindow):
             "Patent": self._launch_patent,
             "Snip": self._launch_snip
         }
+
+        # Установка иконки для кнопки "T"
+        t_path = resource_path("resources/t.png")
+        t_pixmap = QPixmap(t_path)
+        if t_pixmap.isNull():
+            print(f"Failed to load {t_path}. Make sure the file exists in the correct directory.")
+            self.buttons["T"].setText("T")  # Запасной вариант, если изображение не загрузилось
+        else:
+            t_icon = QIcon(t_pixmap.scaled(24, 24, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+            self.buttons["T"].setIcon(t_icon)
+            self.buttons["T"].setIconSize(QSize(24, 24))
 
         patent_path = resource_path("resources/patent.png")
         patent_pixmap = QPixmap(patent_path)
