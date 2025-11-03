@@ -1,0 +1,10 @@
+[
+    {
+        "date": "2025-05-01",
+        "tasks": {
+            "completed": 1,
+            "deferred": 3,
+            "total": 12
+        }
+    }
+]
